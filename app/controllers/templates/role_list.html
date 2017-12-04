@@ -1,0 +1,177 @@
+{% extends "layout/index_layout.html" %}
+{% block title %}角色管理{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for(".static",filename="lib/select2/css/select2.min.css") }}" />
+<style>
+.bootgrid-footer .search, .bootgrid-header .search{
+    float: left;
+}
+</style>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="zmdi zmdi-accounts-alt"></i> 角色管理</h2>
+                <ul class="actions">
+                    <li><a data-toggle="modal" href="#modalDefault" title="添加用户角色"><i class="zmdi zmdi-plus-circle"></i></a></li>
+                </ul>
+            </div>
+
+            <div class="card-body table-responsive">
+
+                <table id="role-data" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th data-column-id="user">用户</th>
+                            <th data-column-id="department">部门</th>
+                            <th data-column-id="role">角色</th>
+                            <th class="text-right" data-column-id="userId" data-formatter="commands" data-sortable="false">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for role in roleList %}
+                        <tr>
+                            <td>{{ role["userName"] }}</td>
+                            <td>{{ role["department"] }}</td>
+                            <td>{{ role["roleCode"] }}</td>
+                            <td>{{ role["userId"] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalDefault" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">添加用户角色</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <select class="form-control" id="user-select" multiple="multiple"></select>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="fg-line">
+                                <input type="text" class="form-control" id="role" placeholder="角色代码 eg: Admin">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <p class="text-danger pull-left" id="errtext"></p>
+                    <button type="button" class="btn btn-link" data-dismiss="modal" onclick="saveRole()"> 保存</button>
+                    <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block foot %}{% endblock %}
+{% block script %}
+    <script src="{{ url_for(".static",filename="lib/bootgrid/jquery.bootgrid.updated.min.js") }}"></script>
+    <script src="{{ url_for(".static",filename="lib/select2/js/select2.min.js") }}"></script>
+    <script src="{{ url_for(".static",filename="lib/select2/js/i18n/zh-CN.js") }}"></script>
+    <script>
+    $(document).ready(function(){
+        $("#role-data").bootgrid({
+            css: {
+                icon: 'zmdi icon',
+                iconColumns: 'zmdi-view-module',
+                iconDown: 'zmdi-caret-down',
+                iconRefresh: 'zmdi-refresh',
+                iconUp: 'zmdi-caret-up'
+            },
+            formatters: {
+                "commands": function(column, row) {
+                    return "<button type=\"button\" class=\"btn bgm-orange waves-effect\" data-row-id=\"" + row.userId + "\" onclick='deleteUser(\""+row.userId+"\")'><span class=\"zmdi zmdi-delete\"></span></button>";
+                }
+            }
+        });
+
+        $("#user-select").select2({
+            placeholder: '用户',
+            language: 'zh-CN',
+            ajax: {
+                url: '/api/usersearch',
+                type: "get",
+                dataType: 'json',
+                delay: 300,
+                data: function (params) {
+                    return {
+                        "keyword":params.term
+                    }
+                },
+                processResults:function (data) {
+                    var users = data.data.searchData
+                    var rel = []
+                    for(var index = 0;index<users.length;index++){
+                        rel.push({
+                            "id":users[index].id,
+                            "text":users[index].name,
+                            "name": users[index].name,
+                            "department":users[index].department
+                        })
+                    }
+                    return {results: rel};
+                },
+                cache: true
+            },
+            minimumInputLength:1,
+            allowClear: false,
+            templateSelection:function (repo) {
+                return repo.name;
+            },
+            templateResult:function (repo) {
+                if(repo.loading){
+                    return repo.text
+                }
+                return repo.name + " ( " + repo.department + " )"
+            }
+        })
+        $($(".select2-container")[0]).css("width","100%")
+    })
+    function saveRole(){
+        var users = $("#user-select").val()
+        var role = $("#role").val()
+        if(users && users.length > 0 && role) {
+            $.post("/app/rolemanage/{{ appid }}",{
+                "role":role,
+                "users":users
+            },function (data) {
+                location.reload()
+            },dataType="json")
+        }else {
+            sweetAlert("填写参数不完整")
+        }
+    }
+    function deleteUser(user) {
+        if(user){
+            swal({
+                    title: "是否确定删除?",
+                    text: "",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "删除",
+                    cancelButtonText: "取消",
+                    closeOnConfirm: true,
+                    closeOnCancel: true
+                },
+                function(isConfirm){
+                    if (isConfirm) {
+                        $.post("/app/rolemanage/{{ appid }}/"+user,function (data) {
+                            location.reload()
+                        })
+                    }
+            });
+
+        }
+    }
+
+    </script>
+{% endblock %}

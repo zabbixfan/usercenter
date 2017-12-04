@@ -1,0 +1,126 @@
+{% extends "layout/index_layout.html" %}
+{% block title %}APP 详情{% endblock %}
+{% block head %}
+<style>
+.table-view{
+    font-size: 14px;
+}
+.table-view td{
+    border-top: 0px !important;
+}
+.app-text-logo {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    background-color: #2196F3;
+    border-radius: 25px;
+}
+
+.app-text-logo span {
+    height: 50px;
+    line-height: 50px;
+    color: #FFF;
+    text-align: center;
+    font-weight: bold;
+    font-size: 40px;
+    text-transform: uppercase;
+}
+
+.app-img-logo {
+    height: 50px;
+    max-width: 100%;
+}
+
+</style>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="zmdi zmdi-widgets"></i> 应用详情</h2>
+                <ul class="actions">
+                    <li><a href="/outlinkapp/edit/{{ app.outlink_id }}" title="编辑"><i class="zmdi zmdi-edit"></i></a></li>
+
+                    <li class="dropdown">
+                        <a href="" data-toggle="dropdown" aria-expanded="false">
+                            <i class="zmdi zmdi-more-vert"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li id="sa-warning">
+                                <a>删除</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card-body">
+                <div class="text-center" style="padding: 30px;">
+                    {% if app.outlink_logo %}
+                        <img src="{{ app.outlink_logo }}" class="app-img-logo">
+
+                    {% else %}
+                    <div class="app-text-logo" style="background-color: {{ app.outlink_logo_color }}"><span>{{ app.outlink_name[0] }}</span></div>
+                    {% endif %}
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-inner table-vmiddle table-view">
+                        <tr>
+                            <td><b>名称</b></td>
+                            <td>{{ app.outlink_name }}</td>
+                        </tr>
+                        <tr>
+                            <td><b>描述</b></td>
+                            <td>{{ app.outlink_description }}</td>
+                        </tr>
+                        <tr>
+                            <td><b>首页</b></td>
+                            <td>{{ app.outlink_index_url }}</td>
+                        </tr>
+                        <tr>
+                            <td><b>状态</b></td>
+                            <td>
+                                {% if app.outlink_status == 'beta' %}
+                                    内测
+                                {% elif app.outlink_status == 'online' %}
+                                    开放
+                                {% else %}
+                                    {{ app.outlink_status }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block foot %}{% endblock %}
+{% block script %}
+<script>
+    $('#sa-warning').click(function(){
+        swal({
+            title: "",
+            text: "确定要删除应用?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "删除",
+            cancelButtonText:"取消",
+            closeOnConfirm: false
+        }, function(){
+            $.post("/outlinkapp/delete/{{ app.outlink_id }}",null,function (data,status,xhr) {
+                swal({
+                    title:"已删除!",
+                    text:"点击按钮返回管理页",
+                    type:"success",
+                },function () {
+                    location.href="/app/list"
+                });
+            })
+        });
+    });
+</script>
+{% endblock %}
+

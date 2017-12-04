@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<!--[if IE 9 ]><html class="ie9"><![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="{{url_for('.static',filename='lib/animate.css/animate.min.css')}}" rel="stylesheet">
+    <link href="{{url_for('.static',filename='lib/material-design-iconic-font/dist/css/material-design-iconic-font.min.css')}}" rel="stylesheet">
+    <link href="{{ url_for('.static',filename='lib/jquery-showLoading/showLoading.css') }}" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{url_for('.static',filename='css/app.min.1.css')}}">
+    <link rel="stylesheet" href="{{url_for('.static',filename='css/app.min.2.css')}}">
+    <style>
+        .lc-block:not(.lcb-alt) {
+            padding: 35px 45px 35px 25px;
+        }
+        
+        #header .logo a {
+            font-size: 21.5px;
+            padding: 3px 10px;
+        }
+        
+        .lc-block {
+            margin-top: 0px;
+        }
+
+        .loading {
+          position: relative;
+          pointer-events: none;
+        }
+
+    </style>
+
+</head>
+
+<body class="login-content">
+
+    <header id="header" class="clearfix" data-current-skin="blue">
+        <ul class="header-inner">
+            <li class="logo">
+                <b><a href="" style="font-size:21.5px;padding:3px 10px;">ALOPEX 统一用户登陆</a></b>
+            </li>
+        </ul>
+    </header>
+
+    <!-- Login -->
+    <form class="lc-block toggled" id="l-login" method="post">
+        <input type="hidden" name="appid" value="{{ appid if appid else "" }}">
+        <input type="hidden" name="callback" value="{{ callback_url if callback_url else "" }}">
+        <div class="input-group m-b-20">
+            <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
+            <div class="fg-line">
+                <input type="text" class="form-control" placeholder="Username" name="name" id="loginName" value="{{ name if name else '' }}">
+            </div>
+        </div>
+        <div id="result"></div>
+        <div class="input-group m-b-20">
+            <span class="input-group-addon"><i class="zmdi zmdi-key"></i></span>
+            <div class="fg-line">
+                <input type="password" class="form-control" placeholder="Password" name="pwd" id="loginPwd" value="{{ pwd if pwd else '' }}">
+            </div>
+        </div>
+
+        <button class="btn btn-primary waves-effect" onclick=" return getCode()">获取验证码</button>
+        <button class="btn btn-danger waves-effect" onclick="return loginV()">登录</button>
+        <div><small class="text-danger" id="loginErrMsg">{{ msg if msg else "" }}</small></div>
+
+    </form>
+    </div>
+
+
+
+    <script src="{{url_for('.static',filename='lib/jquery/dist/jquery.min.js')}}"></script>
+    <script src="{{url_for('.static',filename='lib/bootstrap/dist/js/bootstrap.min.js')}}"></script>
+    <script src="{{url_for('.static',filename='lib/Waves/dist/waves.min.js')}}"></script>
+    <script src="{{url_for('.static',filename='js/functions.js')}}"></script>
+    <script src="{{url_for('.static',filename='lib/bootstrap-growl/bootstrap-growl.min.js')}}"></script>
+    <script src="{{url_for('.static',filename='lib/jquery-showLoading/jquery.showLoading.min.js')}}"></script>
+    <script>
+        $(document).ready(function(){
+            $("#loginName").val("");
+            $("#loginPwd").val("");
+        })
+        function loginV() {
+            var name = $("#loginName").val();
+            var pwd = $("#loginPwd").val();
+            if (name && pwd) {
+                $("#loginErrMsg").text("")
+                // show loading
+                $("body").showLoading();
+                return true;
+            }
+            $("#loginErrMsg").text("填写信息不完整")
+            return false;
+        }
+
+        function getCode() {
+            data ={
+                phone: $("#loginName").val()
+            }
+            $.ajax({
+                type: "POST",
+                url: "/setcode",
+                data: data,
+                success: function(res){
+                    console.log(res);
+                    $("#loginErrMsg").html(res)
+                },
+                error: function(res){
+                    console.log(res);
+                    $("#loginErrMsg").html(res.responseJSON)
+                }
+
+        })
+            return false
+        }
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,246 @@
+{% extends "layout/index_layout.html" %}
+{% block title %}个人信息{% endblock %}
+{% block head %}
+<style>
+.profile-view .pv-body{
+    margin-top: 50px;
+}
+
+.profile-view .pv-body>h2{
+    font-size: 25px;
+    font-family:"Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑","Glyphicons Halflings",Arial;
+    margin-bottom: 30px;
+}
+
+.pv-body ul{
+    font-size: 16px;
+}
+
+#errtext{
+    padding: 6px;
+    margin: 0px;
+}
+
+.profile-view .pv-body .pv-contact>li{
+    margin: 5px;
+}
+
+#code table{
+    margin: 0 auto 10px;
+}
+
+</style>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="block-header">
+            <h2>个人信息</h2>
+            <ul class="actions">
+                {% if user_info.otp_key %}
+                <li><a title="解绑两步验证" onclick="deleteOTP()"><i class="zmdi zmdi-layers-off"></i></a></li>
+                {% else %}
+                <li><a data-toggle="modal" href="#modalBindOTP" title="绑定两步验证"><i class="zmdi zmdi-layers"></i></a></li>
+                {% endif %}
+                <li><a data-toggle="modal" href="#modalChangePwd" title="修改密码"><i class="zmdi zmdi-lock-open"></i></a></li>
+            </ul>
+        </div>
+        <div class="card profile-view">
+            <div class="pv-header">
+
+            </div>
+
+            <div class="pv-body">
+                <h2>{{ user_info.user_name }}</h2>
+
+
+                <ul class="pv-contact">
+                    <li><i class="zmdi zmdi-email"></i> {{ user_info.user_exmail if user_info.user_exmail else user_info.user_email }}
+                    <li><i class="zmdi zmdi-phone"></i> {{ user_info.user_mobile }}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Default -->
+    <div class="modal fade" id="modalChangePwd" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">修改密码</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <div class="fg-line">
+                                <input type="password" class="form-control" placeholder="原密码" id="oldpwd">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="fg-line">
+                                <input type="password" class="form-control" placeholder="新密码" id="newpwd">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="fg-line">
+                                <input type="password" class="form-control" placeholder="重复新密码" id="renewpwd">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <p class="text-danger pull-left" id="errtext"></p>
+                    <button type="button" class="btn btn-link" onclick="changepwd()"> 保存修改 </button>
+                    <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalBindOTP" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">绑定两步验证</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="well">
+                        请使用身份验证器扫描下面二维码或手动输入密钥<code id="key"></code>
+                    </div>
+                    <div id="code"></div>
+                    <div class="form-group">
+                        <div class="fg-line">
+                            <input id="otp" type="input" class="form-control" placeholder="验证 OTP码">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <p class="text-danger pull-left" id="codeerrtext"></p>
+                    <button type="button" class="btn btn-link" onclick="setOtp()"> 绑定 </button>
+                    <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block foot %}{% endblock %}
+{% block script %}
+<script src="{{ url_for(".static",filename="lib/jquery-qrcode/jquery.qrcode.min.js") }}"></script>
+<script>
+
+var has_code = {{ "true" if user_info.otp_key else "false"  }}
+
+if(!has_code){
+    getQRcode()
+}
+function getQRcode() {
+    $.get("/api/totp",function (data) {
+        $("#key").text(data.data.key)
+        $('#code').text("")
+        $('#code').qrcode({
+            render: "table", //table方式
+            width: 200, //宽度
+            height:200, //高度
+            text: data.data.url //任意内容
+        });
+    })
+}
+
+function setOtp() {
+    var key = $('#key').text()
+    var otp = $('#otp').val()
+    if(key && otp){
+        $("#modalBindOTP").modal('hide')
+        $.ajax("/api/totp",{
+            data:{"key":key,"otp":otp},
+            success:function (data) {
+                swal({
+                    title:"绑定成功",
+                    text:"重新登陆后生效",
+                    type:"success",
+                },function () {
+                    location.reload()
+                });
+            },
+            error:function (data) {
+                swal({
+                    title:"绑定失败",
+                    text:data.responseJSON.message,
+                    type:"error",
+                },function () {
+                    $('#otp').val("")
+                });
+            },
+            type:"POST"
+        })
+
+    }else {
+        $("#codeerrtext").text('请输入验证器上6位 OTP码')
+    }
+}
+
+function deleteOTP() {
+    swal({
+        title: "是否确认解绑两步验证?",
+        text: "",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "解绑",
+        cancelButtonText: "取消",
+        closeOnConfirm: false,
+        closeOnCancel: true },
+        function(isConfirm){
+            if (isConfirm) {
+                $.ajax("/api/totp",{type:"DELETE",success:function(){
+                    swal({
+                        title:"解绑成功",
+                        text:"重新登陆后生效",
+                        type:"success",
+                        },function () {
+                            location.reload()
+                        });
+                }})
+            }
+        }
+    );
+}
+
+
+function changepwd() {
+    oldpwd=$("#oldpwd").val()
+    newpwd=$("#newpwd").val()
+    renewpwd=$("#renewpwd").val()
+    if(oldpwd && newpwd && renewpwd){
+        if(newpwd==renewpwd){
+            $("#errtext").text('')
+            $("#modalChangePwd").modal('hide')
+            $.post('/current/changepwd',{oldpwd:oldpwd,newpwd:newpwd},function (result) {
+                if(result.success){
+                    swal({
+                        title:"密码修改成功",
+                        text:"",
+                        type:"success",
+                    },function () {
+                        location.reload()
+                    });
+                }else{
+                    swal({
+                        title:"密码修改失败",
+                        text:result.msg,
+                        type:"error",
+                    },function () {
+                        location.reload()
+                    });
+                }
+            })
+        }else{
+            $("#errtext").text('两次密码不一致')
+        }
+    }else {
+        $("#errtext").text('填写信息不完整')
+    }
+}
+
+</script>
+{% endblock %}
+

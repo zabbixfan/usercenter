@@ -1,0 +1,104 @@
+{% extends "layout/index_layout.html" %}
+{% block title %}ALOPEX 工作台{% endblock %}
+{% block head %}
+    <style>
+        .profile-pic {
+            height: 77px;
+        }
+
+        .app-panel:hover {
+            box-shadow: 0 10px 30px rgba(0,0,0,.15);
+            -webkit-transform: translate3d(0,-2px,0);
+            transform: translate3d(0,-2px,0);
+        }
+
+        .app-panel>div {
+            padding: 50px 0px;
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", "Glyphicons Halflings", Arial;
+        }
+
+        .app-text-logo {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            background-color: #2196F3;
+            border-radius: 25px;
+        }
+
+        .app-text-logo span {
+            height: 50px;
+            line-height: 50px;
+            color: #FFF;
+            text-align: center;
+            font-weight: bold;
+            font-size: 40px;
+        }
+
+        .app-img-logo {
+            height: 50px;
+            max-width: 100%;
+        }
+
+        .app-title {
+            font-size: 22px;
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", "Glyphicons Halflings", Arial;
+        }
+        .panel-container{
+            min-height: 235px;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="block-header">
+            <h2>应用面板</h2>
+        </div>
+        <div class="row panel-container">
+            {% for app in apps %}
+            <div class="col-sm-3">
+                <a href="{{ app.app_index_url }}">
+                    <div class="card app-panel">
+                        <div class="card-body text-center">
+                            {% if app.app_logo %}
+                                <img src="{{ app.app_logo }}" class="app-img-logo">
+
+                            {% else %}
+                            <div class="app-text-logo" style="background-color: {{ app.app_logo_color }}"><span>{{ app.app_name[0] }}</span></div>
+                            {% endif %}
+
+
+                            <h1 class="app-title">{{ app.app_name }}</h1>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="block-header">
+            <h2>外部应用</h2>
+        </div>
+        <div class="row">
+            {% for app in outlinkapps %}
+            <div class="col-sm-3">
+                <a href="{{ app.outlink_index_url }}">
+                    <div class="card app-panel">
+                        <div class="card-body text-center">
+                            {% if app.outlink_logo %}
+                                <img src="{{ app.outlink_logo }}" class="app-img-logo">
+
+                            {% else %}
+                            <div class="app-text-logo" style="background-color: {{ app.outlink_logo_color }}"><span>{{ app.outlink_name[0] }}</span></div>
+                            {% endif %}
+
+
+                            <h1 class="app-title">{{ app.outlink_name }}</h1>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+{% block foot %}{% endblock %}
+{% block script %}{% endblock %}

@@ -1,0 +1,130 @@
+{% extends "layout/index_layout.html" %}
+{% block title %}APP 管理{% endblock %}
+{% block head %}
+<style>
+.lv-title h4{
+    margin-top: 0px;
+    margin-bottom: 9px;
+    font-size: 20px;
+    color: #000;
+}
+.h-bgc-blue:hover{
+    box-shadow: 0 10px 30px rgba(0,0,0,.15);
+    -webkit-transform: translate3d(0,-2px,0);
+    transform: translate3d(0,-2px,0);
+    cursor:pointer;
+}
+.lv-only-title{
+    margin-top: 14px;
+    margin-bottom: 14px;
+}
+
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="block-header">
+        <h2>应用管理</h2>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="zmdi zmdi-apps"></i> 自建应用</h2>
+        </div>
+        <div class="card-body card-padding">
+            <div class="row">
+
+                {% for app in apps %}
+                    <div class="col-md-4 h-bgc-blue" onclick="gotoUrl('{{ app.app_index_url }}')">
+                        <div class="media m-t-10 m-b-10 p-t-10 p-b-10">
+                            <div class="pull-left">
+                                {% if app.app_logo %}
+                                    <img src="{{ app.app_logo }}" class="app-img-logo">
+                                {% else %}
+                                <div class="app-text-logo text-center" style="background-color: {{ app.app_logo_color }}"><span>{{ app.app_name[0] }}</span></div>
+                                {% endif %}
+                            </div>
+                            <div class="media-body">
+                                <div class="lv-title"><h4>{{ app.app_name }}</h4></div>
+                                <small class="lv-small">
+                                    <span class="badge">
+                                        {% if app.app_status == 'beta' %}
+                                            内测
+                                        {% elif app.app_status == 'online' %}
+                                            开放
+                                        {% else %}
+                                            {{ app.app_status }}
+                                        {% endif %}</span>
+                                    <span class="badge">
+                                        {% if app.default_access_status == 'Allow' %}
+                                            默认可访问
+                                        {% elif app.default_access_status == 'NotAllow' %}
+                                            默认不可访问
+                                        {% else %}
+                                            {{ app.default_access_status }}
+                                        {% endif %}
+                                    </span>
+                                </small>
+                            </div>
+                            <div style="text-align: right;margin: 10px 0px 0px;">
+                                <a href="/app/rolemanage/{{ app.app_id }}" class="btn bgm-orange waves-effect btn-icon-text"><i class="zmdi zmdi-accounts-alt"></i> 角色管理</a>
+                                <a href="/app/info/{{ app.app_id }}" class="btn btn-primary waves-effect btn-icon-text"><i class="zmdi zmdi-apps"></i> 应用详情</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="zmdi zmdi-view-dashboard"></i> 外部应用</h2>
+        </div>
+        <div class="card-body card-padding">
+            <div class="row">
+
+                {% for app in outlinkApps %}
+                    <div class="col-md-4 h-bgc-blue" onclick="gotoUrl('{{ app.outlink_index_url }}')">
+                        <div class="media m-t-10 m-b-10 p-t-10 p-b-10">
+                            <div class="pull-left">
+                                {% if app.outlink_logo %}
+                                    <img src="{{ app.outlink_logo }}" class="app-img-logo">
+                                {% else %}
+                                <div class="app-text-logo text-center" style="background-color: {{ app.outlink_logo_color }}"><span>{{ app.outlink_name[0] }}</span></div>
+                                {% endif %}
+                            </div>
+                            <div class="media-body">
+                                <div class="lv-title"><h4>{{ app.outlink_name }}</h4></div>
+
+                                <small class="lv-small">
+                                    <span class="badge">
+                                        {% if app.outlink_status == 'beta' %}
+                                            内测
+                                        {% elif app.outlink_status == 'online' %}
+                                            开放
+                                        {% else %}
+                                            {{ app.outlink_status }}
+                                        {% endif %}</span>
+                                    </span>
+                                </small>
+                            </div>
+                            <div style="text-align: right;margin: 10px 0px 0px;">
+                                <a href="/outlinkapp/info/{{ app.outlink_id }}" class="btn btn-primary waves-effect">详情</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block foot %}{% endblock %}
+{% block script %}
+<script>
+function gotoUrl(url) {
+    location.href=url;
+}
+</script>
+{% endblock %}

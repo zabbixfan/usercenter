@@ -1,0 +1,292 @@
+{% extends "layout/index_layout.html" %}
+{% block title %}创建 APP{% endblock %}
+{% block head %}
+    <link href="{{ url_for(".static",filename="lib/farbtastic/farbtastic.css") }}" rel="stylesheet">
+    <style>
+        .cp-container > .form-group input.cp-value {
+            color: #000 !important;
+            background: transparent !important;
+        }
+        .thumbnail{
+            border: 0px;
+        }
+        .fileinput .fileinput-preview{
+            width: 150px;
+            height: 150px;
+        }
+        label{
+            font-size: 11px;
+            font-weight: 400;
+            color: #959595;
+        }
+        .help-block{
+            margin: 0px;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="zmdi zmdi-widgets"></i> 创建应用</h2>
+            </div>
+
+            <div class="card-body">
+                <ul class="tab-nav tn-justified tn-icon" role="tablist">
+                    <li role="presentation" class="active">
+                        <a class="col-sx-4" href="#tab-1" aria-controls="tab-1" role="tab" data-toggle="tab">
+                            自建应用
+                        </a>
+                    </li>
+                    <li role="presentation">
+                        <a class="col-xs-4" href="#tab-2" aria-controls="tab-2" role="tab" data-toggle="tab">
+                            外部应用
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="tab-content p-20">
+                    <div role="tabpanel" class="tab-pane animated fadeIn in active" id="tab-1">
+                        <form class="p-t-30" id="addApp" method="post" action="/app/add">
+                            <div class="form-group fg-float m-b-30">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control input-sm" name="name">
+                                    <label class="fg-label"><span class="text-danger">*</span> 名称</label>
+                                </div>
+                            </div>
+                            <div class="form-group fg-float m-b-30">
+                                <div class="fg-line">
+                                    <textarea class="form-control auto-size input-sm" name="desc"></textarea>
+                                    <label class="fg-label">描述</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control input-sm" name="domain">
+                                    <label class="fg-label"><span class="text-danger">*</span> 域名 ( 例如：xxx.apitops.com )</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control input-sm" name="index">
+                                    <label class="fg-label"><span class="text-danger">*</span> 首页链接 ( 例如：http://xxx.apitops.com/ )</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control input-sm" name="repo">
+                                    <label class="fg-label">代码仓库地址 ( 例如：http://gitlab.apitops.com/xxx.git )</label>
+                                </div>
+                            </div>
+
+                            <div class="cp-container m-b-30">
+                                <div class="form-group">
+                                    <label><span class="text-danger">*</span> 文字 LOGO 颜色</label>
+                                    <div class="fg-line dropdown">
+                                        <input type="text" class="form-control cp-value" value="#2196F3" data-toggle="dropdown" name="color">
+
+                                        <div class="dropdown-menu">
+                                            <div class="color-picker" data-cp-default="#2196F3"></div>
+                                        </div>
+
+                                        <i class="cp-value"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control input-sm" name="logo">
+                                    <label class="fg-label">logo 图片路径 ( 例如：http://xxx.apitops.com/xxx.png )</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group m-b-30">
+                                <div class="fg-line">
+                                    <label class="fg-label">应用状态</label>
+                                    <div class="select">
+                                        <select class="form-control" name="status">
+                                            <option value="beta">内测</option>
+                                            <option value="online">开放</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group m-b-30">
+                                <div class="fg-line">
+                                    <label class="fg-label">默认访问状态</label>
+                                    <div class="select">
+                                        <select class="form-control" name="defaultAccessStatus">
+                                            <option value="NotAllow">默认所有人不可访问</option>
+                                            <option value="Allow">默认所有人可访问</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-info"> 创建应用 </button>
+                        </form>
+                    </div>
+
+                    <div role="tabpanel" class="tab-pane animated fadeIn" id="tab-2">
+                        <form class="m-t-30" id="addOutApp" method="post" action="/outlinkapp/add">
+                            <div class="form-group fg-float m-b-30">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control input-sm" name="name">
+                                    <label class="fg-label"><span class="text-danger">*</span> 名称</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                <div class="fg-line">
+                                    <textarea class="form-control auto-size input-sm" name="desc"></textarea>
+                                    <label class="fg-label">描述</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control input-sm" name="index">
+                                    <label class="fg-label"><span class="text-danger">*</span> 首页路径 ( 例如：http://xxx.apitops.com/ )</label>
+                                </div>
+                            </div>
+
+                            <div class="cp-container m-b-30">
+                                <div class="form-group">
+                                    <label><span class="text-danger">*</span> 文字 LOGO 颜色</label>
+                                    <div class="fg-line dropdown">
+                                        <input type="text" class="form-control cp-value" value="#2196F3" data-toggle="dropdown" name="color">
+
+                                        <div class="dropdown-menu">
+                                            <div class="color-picker" data-cp-default="#2196F3"></div>
+                                        </div>
+
+                                        <i class="cp-value"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control input-sm" name="logo">
+                                    <label class="fg-label">logo 图片路径 ( 例如：http://xxx.apitops.com/xxx.png )</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group m-b-30">
+                                <div class="fg-line">
+                                    <label class="fg-label">应用状态</label>
+                                    <div class="select">
+                                        <select class="form-control" name="status">
+                                            <option value="online">开放</option>
+                                            <option value="beta">内测</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-info"> 创建应用 </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block foot %}{% endblock %}
+{% block script %}
+    <script src="{{ url_for(".static",filename="lib/autosize/dist/autosize.min.js") }}"></script>
+    <script src="{{ url_for(".static",filename="lib/fileinput/fileinput.min.js") }}"></script>
+    <script src="{{ url_for(".static",filename="lib/farbtastic/farbtastic.min.js") }}"></script>
+    <script src="{{ url_for(".static",filename="lib/jquery-validation/jquery.validate.min.js") }}"></script>
+    <script src="{{ url_for(".static",filename="lib/jquery-validation/messages_zh.js") }}"></script>
+    <script>
+        $.validator.addMethod('gitUrl',function (value, element) {
+            return value? /^https?:\/\/.*\.git$/.test(value) : true
+        },'git http/https url 格式不正确')
+        $.validator.addMethod('url',function (value, element) {
+            return value? /^https?:\/\//.test(value) : true
+        },'url 格式不正确')
+        $.validator.addMethod('color',function (value, element) {
+            return value? /^#[0-9A-Fa-f]{6}$/.test(value) : true
+        },'颜色代码格式不正确')
+        $.validator.addMethod('imgUrl',function (value, element) {
+            return value? /^https?:\/\/.*?(.jpg|.gif|.png|.jpeg|.JPG|.PNG|.GIF)$/.test(value) : true
+        },'图片 url 格式不正确')
+
+
+        $().ready(function () {
+            $("#addApp").validate({
+                debug:false,
+                onfocusout: function (element) {
+                    $(element).valid();
+                },
+                errorElement:'small',
+                errorClass:'help-block',
+                submitHandler:function (form) {
+                    form.submit();
+                },
+                errorPlacement: function(error, element) {
+                    element.parent().after(error);
+                },
+                success:function (error) {
+
+                },
+                highlight:function (element,errorClass,validClass) {
+                    $(element).parent().parent().addClass('has-error')
+                },
+                unhighlight:function (element,errorClass,validClass) {
+                    $(element).parent().parent().removeClass('has-error')
+                },
+                rules:{
+                    'name':{required:true,maxlength:20},
+                    "desc":{maxlength:225},
+                    'domain':{required:true,maxlength:255},
+                    'index':{required:true,maxlength:255,url:true},
+                    'color':{required:true,color:true},
+                    'repo':{gitUrl:true},
+                    'logo':{imgUrl:true}
+                },
+                messages:{
+
+                }
+            });
+            $("#addOutApp").validate({
+                debug:false,
+                onfocusout: function (element) {
+                    $(element).valid();
+                },
+                errorElement:'small',
+                errorClass:'help-block',
+                submitHandler:function (form) {
+                    form.submit();
+                },
+                errorPlacement: function(error, element) {
+                    element.parent().after(error);
+                },
+                success:function (error) {
+
+                },
+                highlight:function (element,errorClass,validClass) {
+                    $(element).parent().parent().addClass('has-error')
+                },
+                unhighlight:function (element,errorClass,validClass) {
+                    $(element).parent().parent().removeClass('has-error')
+                },
+                rules:{
+                    'name':{required:true,maxlength:20},
+                    "desc":{maxlength:225},
+                    'index':{required:true,maxlength:255,url:true},
+                    'color':{required:true,color:true},
+                    'logo':{imgUrl:true}
+                }
+            })
+        })
+
+    </script>
+{% endblock %}
